@@ -59,6 +59,13 @@ df %>%
   arrange(desc(count))
 
 
+# I added this
+df %>% 
+  select(name, species, mass) %>% 
+  group_by(species) %>% 
+  slice_max(mass, n = 1)
+
+
 
 # top 5 tallest people overall - without grouping this is simply finding the top five across all characters
 df %>% 
