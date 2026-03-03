@@ -25,23 +25,35 @@ df %>% glimpse
 # Algorithms don't like missing values. It messes with the math.
 
 # Get a feel for the missingness
+df %>% 
+  summarize(across(everything(), ~sum(is.na(.x))))
 
 
 
 # first check: is the missingness relevant?
 # use summarize across
+df %>% 
+  group_by(is.na(age)) %>% 
+  summarize(across(everything(), ~mean(.x, na.rm =T)))
 
 
 # fill in missing age values, check our work
+df <- df %>% 
+  mutate(age = if_else(is.na(age), mean(age, na.rm = T), age))
 
-
+mean(df$age)
 # now handle embarked, this time using replace_na()
 # Again, check our work
+df <- df %>% 
+  mutate(embarked = replace_na(embarked, 'O'))
 
 
 # What about cabin missingness? Random?
 # use summarize across again.
 # context: private cabins were assigned for some but not all.
+df %>% 
+  group_by(is.na(cabin)) %>% 
+  summarize(across(everything(), ~mean(.x, na.rm =T)))
 
 
 
@@ -49,7 +61,12 @@ df %>% glimpse
 
 
 # Pass the four columns to summary() to check means, maxes
- 
+outlier_candidates <- c('age', 'sib_sp', 'parch', 'fare')
+
+df %>% 
+  select(all_of(outlier_candidates)) %>% 
+  summary()
+
 
 # calculate extreme threshold caps based on 99th percentile
 
